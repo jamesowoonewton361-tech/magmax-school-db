@@ -1,0 +1,62 @@
+/* Base Layout Configurations */
+body {
+    background-color: #f4f6f9;
+    min-height: 100vh;
+}
+
+/* Login Wrapper Elements */
+.login-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    max-width: 400px;
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation Element Tweaks */
+.navbar-brand {
+    font-size: 1.25rem;
+}
+
+/* Dashboard Statistic Counters styling */
+.stat-card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Form Section Breaks Header Divider styling */
+.form-section-title {
+    border-bottom: 2px solid #0d6efd;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+/* Component Routing Views Visibility */
+.view-section {
+    display: none;
+}
+
+/* Grid Action Click Block styling adjustments */
+.action-btn {
+    transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.action-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+}

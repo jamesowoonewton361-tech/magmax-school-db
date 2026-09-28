@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAGMAX Educational Centre - Portal</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS Link -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginSection" class="container login-container">
+        <div class="card login-card p-4 bg-white">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold text-primary">MAGMAX</h3>
+                <p class="text-muted">Educational Centre Contact Registry</p>
+            </div>
+            <div id="loginError" class="alert alert-danger text-center d-none" role="alert">Invalid Credentials!</div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter username" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER (Hidden until logged in) -->
+    <div id="appSection" class="d-none">
+        
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+            <div class="container">
+                <div class="d-flex align-items-center">
+                    <a class="navbar-brand fw-bold me-3" href="#" onclick="showSection('dashboard')">MAGMAX EDUCATIONAL CENTRE</a>
+                    <button class="btn btn-light btn-sm text-primary fw-bold" onclick="showSection('dashboard')">
+                        <i class="bi bi-house-door-fill"></i> Dashboard
+                    </button>
+                </div>
+                <div class="ms-auto d-flex align-items-center">
+                    <span class="text-white me-3 d-none d-sm-inline"><i class="bi bi-person-circle"></i> Administrator</span>
+                    <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <!-- Alert Notifications -->
+            <div id="notificationAlert" class="alert alert-success text-center d-none" role="alert"></div>
+            <div id="connectionStatus" class="alert alert-secondary d-flex justify-content-between align-items-center py-2 d-none" role="status">
+                <span><i class="bi bi-cloud-check me-2"></i><span id="connectionStatusText">Connected</span></span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+
+            <!-- DASHBOARD VIEW -->
+            <div id="dashboardView" class="view-section">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2 class="fw-bold text-secondary">Dashboard</h2>
+                        <div class="d-flex flex-wrap gap-2 align-items-center"><p class="text-muted mb-0">System metrics and quick configurations.</p><button type="button" class="btn btn-sm btn-outline-primary" onclick="refreshData()"><i class="bi bi-arrow-clockwise"></i> Refresh Data</button></div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="card stat-card bg-white p-3 shadow-sm border-start border-primary border-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="text-muted text-uppercase small">Total Students</h6>
+                                    <h3 class="fw-bold mb-0" id="statStudents">0</h3>
+                                </div>
+                                <i class="bi bi-people-fill text-primary fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stat-card bg-white p-3 shadow-sm border-start border-success border-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="text-muted text-uppercase small">Total Contacts</h6>
+                                    <h3 class="fw-bold mb-0" id="statParents">0</h3>
+                                </div>
+                                <i class="bi bi-person-vcard text-success fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stat-card bg-white p-3 shadow-sm border-start border-warning border-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="text-muted text-uppercase small">Active Classes</h6>
+                                    <h3 class="fw-bold mb-0" id="statClasses">14</h3>
+                                </div>
+                                <i class="bi bi-house-door-fill text-warning fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Blocks -->
+                <h4 class="fw-bold text-secondary mb-3">Quick Actions</h4>
+                <div class="row g-3 mb-5">
+                    <div class="col-md-3">
+                        <button onclick="showSection('add-student')" class="btn btn-outline-primary w-100 p-4 text-center d-flex flex-column align-items-center bg-white action-btn">
+                            <i class="bi bi-person-plus fs-1 mb-2"></i>
+                            Add Student
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button onclick="showSection('class-departments')" class="btn btn-outline-info w-100 p-4 text-center d-flex flex-column align-items-center bg-white action-btn">
+                            <i class="bi bi-grid-3x3-gap fs-1 mb-2"></i>
+                            View Class Rosters
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button onclick="showSection('directory')" class="btn btn-outline-success w-100 p-4 text-center d-flex flex-column align-items-center bg-white action-btn">
+                            <i class="bi bi-search fs-1 mb-2"></i>
+                            Global Search
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button onclick="exportToExcel()" class="btn btn-outline-secondary w-100 p-4 text-center d-flex flex-column align-items-center bg-white action-btn">
+                            <i class="bi bi-file-earmark-excel fs-1 mb-2"></i>
+                            Export to Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- System Utilities Section -->
+                <div class="row g-4">
+                    <div class="col-md-6 mb-5">
+                        <div class="card shadow-sm p-4 border-0 bg-white">
+                            <h5 class="fw-bold text-secondary mb-2"><i class="bi bi-database-down"></i> Secure Data Backup</h5>
+                            <p class="text-muted small">Download your entire student and contact directory dataset as an offline backup archive.</p>
+                            <button onclick="downloadBackup()" class="btn btn-outline-danger btn-sm px-4">Download Local Backup File</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-5">
+                        <div class="card shadow-sm p-4 border-0 bg-white">
+                            <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-arrow-counterclockwise"></i> Restore System Database</h5>
+                            <p class="text-muted small">Upload a previously backed-up `.json` file to restore all student records.</p>
+                            <div class="mb-3">
+                                <input class="form-control" type="file" id="backupFile" accept=".json">
+                            </div>
+                            <button onclick="restoreBackup()" class="btn btn-danger btn-sm px-4">Restore Database</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLASS DEPARTMENTS VIEW -->
+            <div id="classDepartmentsView" class="view-section">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2 class="fw-bold text-secondary">School Departments & Classes</h2>
+                        <p class="text-muted">Select a classroom below to view its registered learners.</p>
+                    </div>
+                </div>
+
+                <!-- Department Grid Layout -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm border-top border-info border-3 p-3 bg-white h-100">
+                            <h5 class="fw-bold text-info"><i class="bi bi-baby-carriage"></i> Early Childhood</h5>
+                            <hr class="my-2">
+                            <div class="d-grid gap-2 mt-2" id="deptEarlyChildhood"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm border-top border-primary border-3 p-3 bg-white h-100">
+                            <h5 class="fw-bold text-primary"><i class="bi bi-book"></i> Primary Department</h5>
+                            <hr class="my-2">
+                            <div class="d-grid gap-2 mt-2" id="deptPrimary"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm border-top border-dark border-3 p-3 bg-white h-100">
+                            <h5 class="fw-bold text-dark"><i class="bi bi-mortarboard-fill"></i> Junior High (JHS)</h5>
+                            <hr class="my-2">
+                            <div class="d-grid gap-2 mt-2" id="deptJHS"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Class Roster Display Panel -->
+                <div id="activeRosterPanel" class="card shadow-sm p-4 mb-5 d-none bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold text-secondary mb-0" id="activeRosterTitle">Class List</h4>
+                        <span class="badge bg-primary fs-6" id="activeRosterCount">0 Learners</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Adm No.</th>
+                                    <th>Learner Name</th>
+                                    <th>DOB</th>
+                                    <th>Gender</th>
+                                    <th>Contacts</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeRosterTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADD STUDENT VIEW -->
+            <div id="addStudentView" class="view-section">
+                <div class="card shadow-sm p-4 mb-5 bg-white">
+                    <h2 class="fw-bold text-secondary text-center mb-4" id="formTitle">Register New Student</h2>
+                    <form id="studentForm">
+                        <input type="hidden" id="editStudentId">
+                        
+                        <h5 class="form-section-title"><i class="bi bi-person-fill"></i> Student Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label">Admission Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="admNo" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="firstName" required pattern="[A-Za-z]+( [A-Za-z]+)*(-[A-Za-z]+)*" title="Names should only contain letters, spaces, or hyphens.">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Surname <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="surname" required pattern="[A-Za-z]+( [A-Za-z]+)*(-[A-Za-z]+)*" title="Names should only contain letters, spaces, or hyphens.">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dob">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                <select class="form-select" id="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Class Assigned <span class="text-danger">*</span></label>
+                                <select class="form-select" id="className" required>
+                                    <option value="">Select Class</option>
+                                    <option value="Creche">Creche</option>
+                                    <option value="Nursery 1">Nursery 1</option>
+                                    <option value="Nursery 2">Nursery 2</option>
+                                    <option value="KG 1">KG 1</option>
+                                    <option value="KG 2">KG 2</option>
+                                    <option value="Basic 1">Basic 1</option>
+                                    <option value="Basic 2">Basic 2</option>
+                                    <option value="Basic 3">Basic 3</option>
+                                    <option value="Basic 4">Basic 4</option>
+                                    <option value="Basic 5">Basic 5</option>
+                                    <option value="Basic 6">Basic 6</option>
+                                    <option value="Basic 7">Basic 7</option>
+                                    <option value="Basic 8">Basic 8</option>
+                                    <option value="Basic 9">Basic 9</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h5 class="form-section-title"><i class="bi bi-people-fill"></i> Parent & Guardian Details</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Father's Name (Optional)</label>
+                                <input type="text" class="form-control" id="fatherName" pattern="[A-Za-z]*( [A-Za-z]+)*(-[A-Za-z]+)*" title="Names should only contain letters, spaces, or hyphens.">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Father's Phone (Optional)</label>
+                                <input type="tel" class="form-control" id="fatherPhone" pattern="([0-9]{10})?" maxlength="10" placeholder="e.g. 0241234567" title="Please enter a valid 10-digit phone number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mother's Name (Optional)</label>
+                                <input type="text" class="form-control" id="motherName" pattern="[A-Za-z]*( [A-Za-z]+)*(-[A-Za-z]+)*" title="Names should only contain letters, spaces, or hyphens.">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mother's Phone (Optional)</label>
+                                <input type="tel" class="form-control" id="motherPhone" pattern="([0-9]{10})?" maxlength="10" placeholder="e.g. 0551234567" title="Please enter a valid 10-digit phone number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Guardian's Name (If not staying with parents)</label>
+                                <input type="text" class="form-control" id="guardianName" pattern="[A-Za-z]*( [A-Za-z]+)*(-[A-Za-z]+)*" title="Names should only contain letters, spaces, or hyphens.">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Guardian's Phone</label>
+                                <input type="tel" class="form-control" id="guardianPhone" pattern="([0-9]{10})?" maxlength="10" placeholder="e.g. 0201234567" title="Please enter a valid 10-digit phone number">
+                            </div>
+                        </div>
+
+                        <h5 class="form-section-title"><i class="bi bi-geo-alt-fill"></i> Address</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-12">
+                                <label class="form-label">Residential Address</label>
+                                <input type="text" class="form-control" id="address" placeholder="e.g. House No. 12, School Junction">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" onclick="showSection('dashboard')" class="btn btn-secondary px-4">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-5 fw-bold">Save Student</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- GLOBAL SEARCH DIRECTORY VIEW -->
+            <div id="directoryView" class="view-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold text-secondary">Global Directory Search</h2>
+                        <p class="text-muted">Instantly find parent/guardian contacts and profiles.</p>
+                    </div>
+                    <button onclick="showSection('add-student')" class="btn btn-primary"><i class="bi bi-person-plus-fill"></i> Add Student</button>
+                </div>
+
+                <!-- Search Panel -->
+                <div class="card shadow-sm p-3 mb-4 bg-white">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Search Name, Admission No, or Phone</label>
+                            <input type="text" id="directorySearch" oninput="renderDirectory()" class="form-control" placeholder="Type here to search dynamically...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Filter List by Class</label>
+                            <select id="directoryClassFilter" onchange="renderDirectory()" class="form-select">
+                                <option value="">All Classes</option>
+                                <option value="Creche">Creche</option>
+                                <option value="Nursery 1">Nursery 1</option>
+                                <option value="Nursery 2">Nursery 2</option>
+                                <option value="KG 1">KG 1</option>
+                                <option value="KG 2">KG 2</option>
+                                <option value="Basic 1">Basic 1</option>
+                                <option value="Basic 2">Basic 2</option>
+                                <option value="Basic 3">Basic 3</option>
+                                <option value="Basic 4">Basic 4</option>
+                                <option value="Basic 5">Basic 5</option>
+                                <option value="Basic 6">Basic 6</option>
+                                <option value="Basic 7">Basic 7</option>
+                                <option value="Basic 8">Basic 8</option>
+                                <option value="Basic 9">Basic 9</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="card shadow-sm p-3 mb-5 bg-white">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Adm No.</th>
+                                    <th>Student Name</th>
+                                    <th>Class</th>
+                                    <th>DOB</th>
+                                    <th>Contacts</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="directoryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SheetJS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Custom Separated JS -->
+    <script src="app.js"></script>
+</body>
+</html>
