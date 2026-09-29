@@ -3,7 +3,7 @@
 // Works with the Node/Express + PostgreSQL API (server.js)
 // ===============================
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://magmax-api.onrender.com/api";
 
 const CLASS_GROUPS = {
     deptEarlyChildhood: ["Creche", "Nursery 1", "Nursery 2", "KG 1", "KG 2"],
