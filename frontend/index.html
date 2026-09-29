@@ -198,9 +198,14 @@
                 <!-- Active Class Roster Display Panel -->
                 <div id="activeRosterPanel" class="card shadow-sm p-4 mb-5 d-none bg-white">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="fw-bold text-secondary mb-0" id="activeRosterTitle">Class List</h4>
-                        <span class="badge bg-primary fs-6" id="activeRosterCount">0 Learners</span>
-                    </div>
+    <h4 class="fw-bold text-secondary mb-0" id="activeRosterTitle">Class List</h4>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-primary fs-6" id="activeRosterCount">0 Learners</span>
+        <button class="btn btn-sm btn-outline-success" onclick="exportToExcel(activeRosterClass)">
+            <i class="bi bi-file-earmark-excel"></i> Export This Class
+        </button>
+    </div>
+</div>
                     <div class="table-responsive">
                         <table class="table table-striped align-middle">
                             <thead class="table-light">
@@ -320,10 +325,14 @@
 
             <!-- GLOBAL SEARCH DIRECTORY VIEW -->
             <div id="directoryView" class="view-section">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h2 class="fw-bold text-secondary">Global Directory Search</h2>
-                        <p class="text-muted">Instantly find parent/guardian contacts and profiles.</p>
+                <div>
+    <h2 class="fw-bold text-secondary">Global Directory Search</h2>
+    <p class="text-muted">Instantly find parent/guardian contacts and profiles.</p>
+</div>
+<div class="d-flex gap-2">
+    <button onclick="exportFilteredDirectory()" class="btn btn-outline-success"><i class="bi bi-file-earmark-excel"></i> Export Filtered List</button>
+    <button onclick="showSection('add-student')" class="btn btn-primary"><i class="bi bi-person-plus-fill"></i> Add Student</button>
+</div>
                     </div>
                     <button onclick="showSection('add-student')" class="btn btn-primary"><i class="bi bi-person-plus-fill"></i> Add Student</button>
                 </div>

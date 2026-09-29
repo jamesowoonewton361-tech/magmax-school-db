@@ -208,12 +208,11 @@ function actionsHtml(s) {
 // -------------------------------
 // DIRECTORY (search + filter)
 // -------------------------------
-function renderDirectory() {
-    const body = $("directoryTableBody");
+function getFilteredStudents() {
     const term = $("directorySearch").value.trim().toLowerCase();
     const cls = $("directoryClassFilter").value;
 
-    const list = students.filter((s) => {
+    return students.filter((s) => {
         if (cls && s.className !== cls) return false;
         if (!term) return true;
         const haystack = [
@@ -222,6 +221,11 @@ function renderDirectory() {
         ].join(" ").toLowerCase();
         return haystack.includes(term);
     });
+}
+
+function renderDirectory() {
+    const body = $("directoryTableBody");
+    const list = getFilteredStudents();
 
     if (list.length === 0) {
         body.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No students found.</td></tr>`;
@@ -349,13 +353,8 @@ async function deleteStudent(id) {
 // -------------------------------
 // EXPORT / BACKUP / RESTORE
 // -------------------------------
-function exportToExcel() {
-    if (students.length === 0) {
-        notify("There are no students to export.", "danger");
-        return;
-    }
-
-    const rows = students.map((s) => ({
+function toRows(list) {
+    return list.map((s) => ({
         "Adm No": s.admNo,
         "First Name": s.firstName,
         "Surname": s.surname,
@@ -370,11 +369,46 @@ function exportToExcel() {
         "Guardian's Phone": s.guardianPhone,
         "Address": s.address
     }));
+}
 
-    const sheet = XLSX.utils.json_to_sheet(rows);
+function writeExcelFile(list, filename, sheetName) {
+    const sheet = XLSX.utils.json_to_sheet(toRows(list));
     const book = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(book, sheet, "Students");
-    XLSX.writeFile(book, "MAGMAX_Students.xlsx");
+    XLSX.utils.book_append_sheet(book, sheet, sheetName.substring(0, 31));
+    XLSX.writeFile(book, filename);
+}
+
+// Exports everyone, or just one class if a class name is passed in
+function exportToExcel(className) {
+    const list = className ? students.filter((s) => s.className === className) : students;
+
+    if (list.length === 0) {
+        notify(
+            className ? `There are no students in ${className} to export.` : "There are no students to export.",
+            "danger"
+        );
+        return;
+    }
+
+    const filename = className
+        ? `MAGMAX_${className.replace(/\s+/g, "_")}.xlsx`
+        : "MAGMAX_Students.xlsx";
+
+    writeExcelFile(list, filename, className || "Students");
+    notify("Excel file downloaded: " + filename);
+}
+
+// Exports whatever is currently shown in Global Search (search text + class filter)
+function exportFilteredDirectory() {
+    const list = getFilteredStudents();
+
+    if (list.length === 0) {
+        notify("No students match the current search/filter to export.", "danger");
+        return;
+    }
+
+    writeExcelFile(list, "MAGMAX_Filtered_Students.xlsx", "Filtered Students");
+    notify("Excel file downloaded: MAGMAX_Filtered_Students.xlsx");
 }
 
 function downloadBackup() {
@@ -434,5 +468,6 @@ window.showRoster = showRoster;
 window.editStudent = editStudent;
 window.deleteStudent = deleteStudent;
 window.exportToExcel = exportToExcel;
+window.exportFilteredDirectory = exportFilteredDirectory;
 window.downloadBackup = downloadBackup;
 window.restoreBackup = restoreBackup;
