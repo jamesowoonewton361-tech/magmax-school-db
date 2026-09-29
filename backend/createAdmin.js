@@ -9,8 +9,10 @@ if (!username || !password) {
   process.exit(1);
 }
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 (async () => {
   try {
     const hash = await bcrypt.hash(password, 10);
