@@ -35,6 +35,34 @@ function esc(value) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+// Converts technical error messages into plain-language explanations
+function friendlyError(error) {
+    const msg = (error && error.message) || "";
+
+    if (msg === "Failed to fetch") {
+        return "Unable to reach the server. Check your internet connection, or the server may be starting up — please wait a moment and try again.";
+    }
+    if (msg.includes("already exists")) {
+        return "That admission number is already used by another student. Please use a different, unique admission number.";
+    }
+    if (msg.startsWith("Missing:")) {
+        const fields = msg.replace("Missing:", "").trim();
+        return "Please fill in the required field(s): " + fields + ".";
+    }
+    if (msg.includes("Session expired")) {
+        return "You've been logged out because your session expired. Please log in again.";
+    }
+    if (msg.includes("Server returned 500")) {
+        return "Something went wrong on our end. Please try again in a moment. If this keeps happening, contact your administrator.";
+    }
+    if (msg.includes("Server returned 404")) {
+        return "That record could not be found. It may have already been deleted.";
+    }
+    if (msg) {
+        return msg;
+    }
+    return "Something went wrong. Please try again.";
+}
 
 function notify(message, type = "success") {
     const box = $("notificationAlert");
@@ -83,6 +111,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     $("loginForm").addEventListener("submit", handleLogin);
     $("studentForm").addEventListener("submit", handleSaveStudent);
+
+    $("togglePassword").addEventListener("click", () => {
+        const input = $("password");
+        const icon = $("togglePasswordIcon");
+        const show = input.type === "password";
+        input.type = show ? "text" : "password";
+        icon.classList.toggle("bi-eye", !show);
+        icon.classList.toggle("bi-eye-slash", show);
+    });
 });
 
 // -------------------------------
@@ -106,11 +143,10 @@ async function handleLogin(e) {
         $("loginForm").reset();
         showApp();
     } catch (error) {
-        errorBox.textContent = error.message === "Failed to fetch"
-            ? "Unable to connect to the server."
-            : error.message;
-        errorBox.classList.remove("d-none");
-    }
+    errorBox.textContent = friendlyError(error);
+    errorBox.classList.remove("d-none");
+}
+
 }
 
 function showLogin() {
@@ -149,6 +185,7 @@ function showSection(name, keepForm = false) {
 // LOAD DATA
 // -------------------------------
 async function loadStudents() {
+    setConnection(true, "Loading data… this may take up to a minute if the server was asleep.");
     try {
         students = await api("/students");
         setConnection(true, "Connected - " + students.length + " students loaded");
@@ -157,9 +194,9 @@ async function loadStudents() {
         renderDepartments();
         if (activeRosterClass) showRoster(activeRosterClass);
     } catch (error) {
-        console.error(error);
-        setConnection(false, "Unable to load data: " + error.message);
-    }
+    console.error(error);
+    setConnection(false, friendlyError(error));
+}
 }
 
 async function refreshData() {
@@ -331,9 +368,9 @@ async function handleSaveStudent(e) {
         resetForm();
         await loadStudents();
         showSection("directory");
-    } catch (error) {
-        notify(error.message, "danger");
-    }
+   } catch (error) {
+    notify(friendlyError(error), "danger");
+}
 }
 
 async function deleteStudent(id) {
@@ -346,8 +383,8 @@ async function deleteStudent(id) {
         notify("Student deleted.");
         await loadStudents();
     } catch (error) {
-        notify(error.message, "danger");
-    }
+    notify(friendlyError(error), "danger");
+}
 }
 
 // -------------------------------

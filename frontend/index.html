@@ -27,9 +27,14 @@
                     <input type="text" id="username" class="form-control" placeholder="Enter username" required>
                 </div>
                 <div class="mb-4">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="password" class="form-control" placeholder="Enter password" required>
-                </div>
+    <label class="form-label">Password</label>
+    <div class="input-group">
+        <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+        <button class="btn btn-outline-secondary" type="button" id="togglePassword" tabindex="-1">
+            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+        </button>
+    </div>
+</div>
                 <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Login</button>
             </form>
         </div>
