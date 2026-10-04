@@ -138,6 +138,40 @@ app.post('/api/students', auth, async (req, res) => {
   }
 });
 
+app.post('/api/students/upsert', auth, async (req, res) => {
+  const missing = missingRequired(req.body);
+  if (missing.length) {
+    return res.status(400).json({ success: false, message: 'Missing: ' + missing.join(', ') });
+  }
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO students
+        (adm_no, first_name, surname, dob, gender, class_name,
+         father_name, father_phone, mother_name, mother_phone,
+         guardian_name, guardian_phone, address)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+       ON CONFLICT (adm_no) DO UPDATE SET
+         first_name = EXCLUDED.first_name,
+         surname = EXCLUDED.surname,
+         dob = EXCLUDED.dob,
+         gender = EXCLUDED.gender,
+         class_name = EXCLUDED.class_name,
+         father_name = EXCLUDED.father_name,
+         father_phone = EXCLUDED.father_phone,
+         mother_name = EXCLUDED.mother_name,
+         mother_phone = EXCLUDED.mother_phone,
+         guardian_name = EXCLUDED.guardian_name,
+         guardian_phone = EXCLUDED.guardian_phone,
+         address = EXCLUDED.address
+       RETURNING ${STUDENT_COLS}, (xmax = 0) AS inserted`,
+      studentValues(req.body)
+    );
+    res.status(200).json({ success: true, student: rows[0], created: rows[0].inserted });
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
 app.put('/api/students/:id', auth, async (req, res) => {
   const missing = missingRequired(req.body);
   if (missing.length) {
