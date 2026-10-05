@@ -415,6 +415,53 @@ function writeExcelFile(list, filename, sheetName) {
     XLSX.writeFile(book, filename);
 }
 
+// Turns each student into one row per parent/guardian contact they actually have.
+// A student with both a father's and mother's number produces two rows.
+function toContactRows(list) {
+    const rows = [];
+    list.forEach((s) => {
+        const name = (s.firstName + " " + s.surname).trim();
+        const contacts = [
+            ["Father", s.fatherName, s.fatherPhone],
+            ["Mother", s.motherName, s.motherPhone],
+            ["Guardian", s.guardianName, s.guardianPhone]
+        ];
+        let hasAny = false;
+        contacts.forEach(([role, contactName, phone]) => {
+            if (contactName || phone) {
+                hasAny = true;
+                rows.push({
+                    "Learner Name": name,
+                    "Relationship": role,
+                    "Contact Name": contactName || "",
+                    "Phone": phone || ""
+                });
+            }
+        });
+        if (!hasAny) {
+            rows.push({ "Learner Name": name, "Relationship": "", "Contact Name": "", "Phone": "" });
+        }
+    });
+    return rows;
+}
+
+// Exports just names + contacts for one class (simple contact sheet for teachers)
+function exportClassContacts(className) {
+    const list = className ? students.filter((s) => s.className === className) : students;
+
+    if (list.length === 0) {
+        notify(`There are no students in ${className} to export.`, "danger");
+        return;
+    }
+
+    const sheet = XLSX.utils.json_to_sheet(toContactRows(list));
+    const book = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(book, sheet, (className || "Contacts").substring(0, 31));
+    const filename = `MAGMAX_${className.replace(/\s+/g, "_")}_Contacts.xlsx`;
+    XLSX.writeFile(book, filename);
+    notify("Contact list downloaded: " + filename);
+}
+
 // Exports everyone, or just one class if a class name is passed in
 function exportToExcel(className) {
     const list = className ? students.filter((s) => s.className === className) : students;
@@ -506,5 +553,6 @@ window.editStudent = editStudent;
 window.deleteStudent = deleteStudent;
 window.exportToExcel = exportToExcel;
 window.exportFilteredDirectory = exportFilteredDirectory;
+window.exportClassContacts = exportClassContacts;
 window.downloadBackup = downloadBackup;
 window.restoreBackup = restoreBackup;
